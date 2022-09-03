@@ -5,3 +5,5 @@ Nc-installer.sh is an easy to use Nextcloud installer that installs on Ubuntu in
 Simply run the script as root or with sudo, enter your desired usernamd and password, then let nc-installer.sh do the rest.
 
 Consider setting up HTTPS if you will be accessing Nexcloud outside of your private network.
+
+The script was tested to run in an LXC container in a Proxmox virtual environment.
