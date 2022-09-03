@@ -137,6 +137,8 @@ sudo -u www-data php occ app:install notes
 sudo -u www-data php occ app:install passwords
 sudo -u www-data php occ app:install mail
 sudo -u www-data php occ app:install spreed
+sudo -u www-data php occ app:install apporder
+sudo -u www-data php occ app:install side_menu
 
 apt-get clean
 apt-get -y install redis-server php-redis --fix-missing
