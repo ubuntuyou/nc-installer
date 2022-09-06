@@ -120,13 +120,13 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysq
 
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 
-sudo -u www-data php occ app:install calendar
-sudo -u www-data php occ app:install notes
-sudo -u www-data php occ app:install passwords
-sudo -u www-data php occ app:install mail
-sudo -u www-data php occ app:install spreed
-sudo -u www-data php occ app:install apporder
-sudo -u www-data php occ app:install side_menu
+sudo -u www-data php /var/www/nextcloud/occ app:install calendar
+sudo -u www-data php /var/www/nextcloud/occ app:install notes
+sudo -u www-data php /var/www/nextcloud/occ app:install passwords
+sudo -u www-data php /var/www/nextcloud/occ app:install mail
+sudo -u www-data php /var/www/nextcloud/occ app:install spreed
+sudo -u www-data php /var/www/nextcloud/occ app:install apporder
+sudo -u www-data php /var/www/nextcloud/occ app:install side_menu
 
 apt-get clean
 apt-get -y install redis-server php-redis --fix-missing
