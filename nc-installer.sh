@@ -110,7 +110,7 @@ server {
 endmsg
 
 sed -i "s/REPLACEME/$PHPVER/g" /etc/nginx/sites-available/nextcloud
-
+sed -i "s/js;/js mjs;/g" /etc/nginx/mime.types
 ln -s /etc/nginx/sites-available/nextcloud -t /etc/nginx/sites-enabled/
 
 systemctl restart nginx
