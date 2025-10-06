@@ -119,17 +119,11 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysq
 --database-user "${DBUSER}" --database-pass "${DBPASS}" --admin-user "${DBUSER}" \
 --admin-pass "${DBPASS}"
 
-sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
-sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
-
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 
 sudo -u www-data php /var/www/nextcloud/occ app:install calendar
 sudo -u www-data php /var/www/nextcloud/occ app:install notes
-#sudo -u www-data php /var/www/nextcloud/occ app:install passwords
 sudo -u www-data php /var/www/nextcloud/occ app:install mail
-sudo -u www-data php /var/www/nextcloud/occ app:install spreed
-#sudo -u www-data php /var/www/nextcloud/occ app:install apporder
 sudo -u www-data php /var/www/nextcloud/occ app:install side_menu
 
 apt-get clean
@@ -144,7 +138,6 @@ systemctl restart redis-server.service
 usermod -aG redis www-data
 
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
-#echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
 
 sed -i "0,/localhost/{s/localhost/$(hostname -I)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
@@ -162,6 +155,9 @@ tee -a /var/www/nextcloud/config/config.php << endmsg
   ),
 );
 endmsg
+
+sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 
 sed -i 's/memory\_limit \= 128M/memory\_limit \= 512M/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER}/fpm/php.ini
