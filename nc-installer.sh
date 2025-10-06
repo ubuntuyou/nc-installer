@@ -17,9 +17,6 @@ php$PHPVER-fpm php$PHPVER-curl php$PHPVER-mysql php$PHPVER-gd php$PHPVER-opcache
 php$PHPVER-zip php$PHPVER-mbstring php$PHPVER-imagick php$PHPVER-intl php$PHPVER-gmp php$PHPVER-bcmath php$PHPVER-apcu \
 libmagickcore-6.q16-6-extra --fix-missing
 
-sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=128/g" /etc/php/8.3/fpm/php.ini
-sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=128/g" /etc/php/8.3/cli/php.ini
-
 systemctl enable --now php${PHPVER}-fpm
 
 systemctl enable --now mysql
@@ -169,7 +166,8 @@ endmsg
 sed -i 's/memory\_limit \= 128M/memory\_limit \= 512M/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/max_file_uploads = 20/max_file_uploads = 200/g' /etc/php/${PHPVER}/fpm/php.ini
-#echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/fpm/php.ini
+sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g" /etc/php/8.3/fpm/php.ini
+sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g" /etc/php/8.3/cli/php.ini
 
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
