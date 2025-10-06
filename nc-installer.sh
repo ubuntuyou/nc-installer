@@ -125,7 +125,7 @@ sudo -u www-data php /var/www/nextcloud/occ background:cron
 
 sudo -u www-data php /var/www/nextcloud/occ app:install calendar
 sudo -u www-data php /var/www/nextcloud/occ app:install notes
-sudo -u www-data php /var/www/nextcloud/occ app:install passwords
+#sudo -u www-data php /var/www/nextcloud/occ app:install passwords
 sudo -u www-data php /var/www/nextcloud/occ app:install mail
 sudo -u www-data php /var/www/nextcloud/occ app:install spreed
 #sudo -u www-data php /var/www/nextcloud/occ app:install apporder
@@ -143,9 +143,9 @@ systemctl restart redis-server.service
 usermod -aG redis www-data
 
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
-echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
+#echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
 
-sed -i "0,/localhost/{s/localhost/$(hostname -i)/g}" /var/www/nextcloud/config/config.php
+sed -i "0,/127.0.1.1/{s/127.0.1.1/$(hostname -i)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
 tee -a /var/www/nextcloud/config/config.php << endmsg
   'default_phone_region' => 'US',
@@ -165,7 +165,7 @@ endmsg
 sed -i 's/memory\_limit \= 128M/memory\_limit \= 512M/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/max_file_uploads = 20/max_file_uploads = 200/g' /etc/php/${PHPVER}/fpm/php.ini
-echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/fpm/php.ini
+#echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/fpm/php.ini
 
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
