@@ -7,7 +7,7 @@ UVER=$(lsb_release -sr | sed 's/\.//')
 
 if [ $UVER -ge 2010 ]
 then
-PHPVER=8.1
+PHPVER=8.3
 else
 PHPVER=7.4
 fi
@@ -57,13 +57,14 @@ server {
         gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
         gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
         # Recommended Security Headers
-        add_header Referrer-Policy                      "no-referrer"   always;
-        add_header X-Content-Type-Options               "nosniff"       always;
-        add_header X-Download-Options                   "noopen"        always;
-        add_header X-Frame-Options                      "SAMEORIGIN"    always;
-        add_header X-Permitted-Cross-Domain-Policies    "none"          always;
-        add_header X-Robots-Tag                         "none"          always;
-        add_header X-XSS-Protection                     "1; mode=block" always;
+        add_header Referrer-Policy                      "no-referrer"           always;
+        add_header X-Content-Type-Options               "nosniff"               always;
+        add_header X-Download-Options                   "noopen"                always;
+        add_header X-Frame-Options                      "SAMEORIGIN"            always;
+        add_header X-Permitted-Cross-Domain-Policies    "none"                  always;
+        add_header X-Robots-Tag                         "noindex,nofollow"      always;
+        add_header X-XSS-Protection                     "1; mode=block"         always;
+        add_header Strict-Transport-Security            "max-age=31526000; includeSubdomains; preload"      always;
         fastcgi_hide_header X-Powered-By;
         # Recommended Hidden Paths
         location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)(?:$|/)  { return 404; }
@@ -118,6 +119,8 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysq
 --database-user "${DBUSER}" --database-pass "${DBPASS}" --admin-user "${DBUSER}" \
 --admin-pass "${DBPASS}"
 
+sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 
 sudo -u www-data php /var/www/nextcloud/occ app:install calendar
@@ -125,7 +128,7 @@ sudo -u www-data php /var/www/nextcloud/occ app:install notes
 sudo -u www-data php /var/www/nextcloud/occ app:install passwords
 sudo -u www-data php /var/www/nextcloud/occ app:install mail
 sudo -u www-data php /var/www/nextcloud/occ app:install spreed
-sudo -u www-data php /var/www/nextcloud/occ app:install apporder
+#sudo -u www-data php /var/www/nextcloud/occ app:install apporder
 sudo -u www-data php /var/www/nextcloud/occ app:install side_menu
 
 apt-get clean
@@ -140,6 +143,7 @@ systemctl restart redis-server.service
 usermod -aG redis www-data
 
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
+echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
 
 sed -i "0,/localhost/{s/localhost/$(hostname -i)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
@@ -161,6 +165,7 @@ endmsg
 sed -i 's/memory\_limit \= 128M/memory\_limit \= 512M/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/max_file_uploads = 20/max_file_uploads = 200/g' /etc/php/${PHPVER}/fpm/php.ini
+echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/fpm/php.ini
 
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
