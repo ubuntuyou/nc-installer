@@ -17,6 +17,9 @@ php$PHPVER-fpm php$PHPVER-curl php$PHPVER-mysql php$PHPVER-gd php$PHPVER-opcache
 php$PHPVER-zip php$PHPVER-mbstring php$PHPVER-imagick php$PHPVER-intl php$PHPVER-gmp php$PHPVER-bcmath php$PHPVER-apcu \
 libmagickcore-6.q16-6-extra --fix-missing
 
+sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=128/g" /etc/php/8.3/fpm/php.ini
+sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=128/g" /etc/php/8.3/cli/php.ini
+
 systemctl enable --now php${PHPVER}-fpm
 
 systemctl enable --now mysql
@@ -145,7 +148,7 @@ usermod -aG redis www-data
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
 #echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
 
-sed -i "0,/127.0.1.1/{s/127.0.1.1/$(hostname -i)/g}" /var/www/nextcloud/config/config.php
+sed -i "0,/127.0.1.1/{s/127.0.1.1/$(hostname -I)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
 tee -a /var/www/nextcloud/config/config.php << endmsg
   'default_phone_region' => 'US',
