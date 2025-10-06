@@ -123,6 +123,7 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysq
 --admin-pass "${DBPASS}"
 
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 
 sudo -u www-data php /var/www/nextcloud/occ background:cron
 
