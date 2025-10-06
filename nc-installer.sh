@@ -146,7 +146,7 @@ usermod -aG redis www-data
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
 #echo -e "opcache.interned_strings_buffer=512" >> /etc/php/${PHPVER}/cli/php.ini
 
-sed -i "0,/127.0.1.1/{s/127.0.1.1/$(hostname -I)/g}" /var/www/nextcloud/config/config.php
+sed -i "0,/localhost/{s/localhost/$(hostname -I)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
 tee -a /var/www/nextcloud/config/config.php << endmsg
   'default_phone_region' => 'US',
