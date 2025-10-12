@@ -136,11 +136,13 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysq
 DBPASS=
 DBUSER=
 
-(sudo -u www-data php /var/www/nextcloud/occ background:cron && \
-sudo -u www-data php /var/www/nextcloud/occ app:install calendar && \
-sudo -u www-data php /var/www/nextcloud/occ app:install notes && \
-sudo -u www-data php /var/www/nextcloud/occ app:install mail && \
-sudo -u www-data php /var/www/nextcloud/occ app:install side_menu) &
+(sudo -u www-data php /var/www/nextcloud/occ background:cron; \
+sudo -u www-data php /var/www/nextcloud/occ app:install calendar; \
+sudo -u www-data php /var/www/nextcloud/occ app:install notes; \
+sudo -u www-data php /var/www/nextcloud/occ app:install mail; \
+sudo -u www-data php /var/www/nextcloud/occ app:install side_menu; \
+sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices; \
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive) &
 
 systemctl enable --now redis-server
 
@@ -168,9 +170,6 @@ tee -a /var/www/nextcloud/config/config.php << endmsg
 );
 endmsg
 
-sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
-sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
-
 sed -i 's/memory\_limit \= 128M/memory\_limit \= 512M/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i 's/max_file_uploads = 20/max_file_uploads = 200/g' /etc/php/${PHPVER}/fpm/php.ini
@@ -181,3 +180,5 @@ sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 systemctl restart php${PHPVER}-fpm
 wait
 systemctl restart cron.service
+printf "\n\n\n"
+printf "Visit http://$(dig +short `hostname -f`) to login to Nextcloud."
