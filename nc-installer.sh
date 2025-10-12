@@ -133,13 +133,14 @@ mysql -e "FLUSH PRIVILEGES;"
 sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysql" --database-name "nextcloud" \
 --database-user "${DBUSER}" --database-pass "${DBPASS}" --admin-user "${DBUSER}" \
 --admin-pass "${DBPASS}"
+DBPASS=
+DBUSER=
 
-sudo -u www-data php /var/www/nextcloud/occ background:cron
-
-sudo -u www-data php /var/www/nextcloud/occ app:install calendar
-sudo -u www-data php /var/www/nextcloud/occ app:install notes
-sudo -u www-data php /var/www/nextcloud/occ app:install mail
-sudo -u www-data php /var/www/nextcloud/occ app:install side_menu
+(sudo -u www-data php /var/www/nextcloud/occ background:cron && \
+sudo -u www-data php /var/www/nextcloud/occ app:install calendar && \
+sudo -u www-data php /var/www/nextcloud/occ app:install notes && \
+sudo -u www-data php /var/www/nextcloud/occ app:install mail && \
+sudo -u www-data php /var/www/nextcloud/occ app:install side_menu) &
 
 systemctl enable --now redis-server
 
@@ -178,8 +179,5 @@ sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
 systemctl restart php${PHPVER}-fpm
-
+wait
 systemctl restart cron.service
-
-DBPASS=
-DBUSER=
