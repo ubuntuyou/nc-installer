@@ -181,4 +181,4 @@ systemctl restart php${PHPVER}-fpm
 wait
 systemctl restart cron.service
 printf "\n\n\n"
-printf "Visit http://$(dig +short `hostname -f`) to login to Nextcloud."
+printf "Visit http://$(dig +short `hostname -f`) to login to Nextcloud.\n"
