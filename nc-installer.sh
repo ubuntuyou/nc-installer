@@ -12,10 +12,27 @@ else
 PHPVER=7.4
 fi
 
-apt-get update && apt-get clean && apt-get -y install unzip nginx mysql-server php$PHPVER  php$PHPVER-common \
+
+
+apt-get update
+
+apt-get clean
+
+apt-get -y install unzip nginx
+
+(wget https://download.nextcloud.com/server/releases/latest.zip && \
+unzip -q latest.zip && \
+rm latest.zip && \
+mv nextcloud /var/www/ && \
+chown -R www-data:www-data /var/www/nextcloud && \
+systemctl enable --now nginx) &
+
+apt-get -y install mysql-server php$PHPVER  php$PHPVER-common \
 php$PHPVER-fpm php$PHPVER-curl php$PHPVER-mysql php$PHPVER-gd php$PHPVER-opcache php$PHPVER-xml php$PHPVER-cli \
 php$PHPVER-zip php$PHPVER-mbstring php$PHPVER-imagick php$PHPVER-intl php$PHPVER-gmp php$PHPVER-bcmath php$PHPVER-apcu \
-libmagickcore-6.q16-6-extra --fix-missing
+libmagickcore-6.q16-6-extra redis-server php-redis --fix-missing
+
+wait
 
 systemctl enable --now php${PHPVER}-fpm
 
@@ -25,17 +42,6 @@ mysql -e "CREATE DATABASE nextcloud;"
 mysql -e "CREATE USER '${DBUSER}'@'localhost' IDENTIFIED BY '${DBPASS}';"
 mysql -e "GRANT ALL PRIVILEGES ON nextcloud.* to '${DBUSER}'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
-
-systemctl enable --now nginx
-
-wget https://download.nextcloud.com/server/releases/latest.zip
-unzip -q latest.zip
-rm latest.zip
-mv nextcloud /var/www/
-chown -R www-data:www-data /var/www/nextcloud
-
-rm /etc/nginx/sites-available/default
-rm /etc/nginx/sites-enabled/default
 
 cat > /etc/nginx/sites-available/nextcloud << 'endmsg'
 upstream php-handler {
@@ -108,12 +114,11 @@ server {
         }
 }
 endmsg
-
 sed -i "s/REPLACEME/$PHPVER/g" /etc/nginx/sites-available/nextcloud
 sed -i "s/js;/js mjs;/g" /etc/nginx/mime.types
 ln -s /etc/nginx/sites-available/nextcloud -t /etc/nginx/sites-enabled/
 
-systemctl restart nginx
+systemctl restart nginx.service
 
 sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysql" --database-name "nextcloud" \
 --database-user "${DBUSER}" --database-pass "${DBPASS}" --admin-user "${DBUSER}" \
@@ -126,9 +131,6 @@ sudo -u www-data php /var/www/nextcloud/occ app:install notes
 sudo -u www-data php /var/www/nextcloud/occ app:install mail
 sudo -u www-data php /var/www/nextcloud/occ app:install side_menu
 
-apt-get clean
-apt-get -y install redis-server php-redis --fix-missing
-
 systemctl enable --now redis-server
 
 sed -i 's/# unixsocket /unixsocket /g' /etc/redis/redis.conf
@@ -138,7 +140,6 @@ systemctl restart redis-server.service
 usermod -aG redis www-data
 
 echo -e "apc.enable_cli=1" >> /etc/php/${PHPVER}/cli/php.ini
-
 sed -i "0,/localhost/{s/localhost/$(dig +short `hostname -f`)/g}" /var/www/nextcloud/config/config.php
 sed -i '$ d' /var/www/nextcloud/config/config.php
 tee -a /var/www/nextcloud/config/config.php << endmsg
@@ -164,7 +165,6 @@ sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/${PHPVER
 sed -i 's/max_file_uploads = 20/max_file_uploads = 200/g' /etc/php/${PHPVER}/fpm/php.ini
 sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g" /etc/php/${PHPVER}/fpm/php.ini
 sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g" /etc/php/${PHPVER}/cli/php.ini
-
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
 systemctl restart php${PHPVER}-fpm
