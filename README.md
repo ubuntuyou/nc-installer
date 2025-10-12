@@ -1,6 +1,6 @@
 # nc-installer
 
-Nc-installer.sh is an easy to use Nextcloud installer that installs on Ubuntu in about 5 minutes.
+Nc-installer.sh is an easy to use Nextcloud installer that installs on Ubuntu in under 3 minutes (depending on hardware).
 
 Simply run the script as root or with sudo, enter your desired username and password, then let nc-installer.sh do the rest.
 
