@@ -117,7 +117,7 @@ endmsg
 sed -i "s/REPLACEME/$PHPVER/g" /etc/nginx/sites-available/nextcloud
 sed -i "s/js;/js mjs;/g" /etc/nginx/mime.types
 ln -s /etc/nginx/sites-available/nextcloud -t /etc/nginx/sites-enabled/
-
+rm /etc/nginx/sites-enabled/default
 systemctl restart nginx.service
 
 sudo -u www-data php /var/www/nextcloud/occ maintenance:install --database "mysql" --database-name "nextcloud" \
