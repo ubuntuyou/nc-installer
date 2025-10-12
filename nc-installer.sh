@@ -113,6 +113,16 @@ wait
 
 systemctl enable --now php${PHPVER}-fpm
 
+while read -r -u 9 user; do
+    {
+    if [ "$user" == "www-data" ]
+    then
+        crontab -l -u "$user"
+        printf '%s\n' '*/5 * * * * php -f /var/www/nextcloud/cron.php'
+    fi
+    } | crontab -u "$user" -
+done 9< <(getent passwd | cut -d: -f1)
+
 systemctl enable --now mysql
 
 mysql -e "CREATE DATABASE nextcloud;"
@@ -168,16 +178,6 @@ sed -i "s/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/
 sed -i 's/;env/env/g' /etc/php/${PHPVER}/fpm/pool.d/www.conf
 
 systemctl restart php${PHPVER}-fpm
-
-while read -r -u 9 user; do
-    {
-    if [ "$user" == "www-data" ]
-    then
-        crontab -l -u "$user"
-        printf '%s\n' '*/5 * * * * php -f /var/www/nextcloud/cron.php'
-    fi
-    } | crontab -u "$user" -
-done 9< <(getent passwd | cut -d: -f1)
 
 systemctl restart cron.service
 
